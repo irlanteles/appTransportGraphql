@@ -1,0 +1,153 @@
+type Motorista {
+  id: Int
+  nome: String!
+  placa: String
+}
+
+type Parada {
+  data: String!
+  horario: String!
+  solicitante: String!
+  autorizado: String!
+  origem: String!
+  destino: String!
+  placa: String
+
+}
+
+type ViagemDashboard {
+  numeroSolicitacao: String!
+  paradas: [Parada!]!
+}
+
+type Dashboard {
+  motorista: Motorista!
+  viagens: [ViagemDashboard!]!
+}
+
+input ChecklistInput {
+  id_solicitacao: Int!
+  limpeza_exterior: Int
+  exterior_detalhes: String
+  limpeza_interior: Int
+  interior_detalhes: String
+  nivel_oleo_motor: Int
+  nivel_oleo_direcao: Int
+  nivel_oleo_freio: Int
+  nivel_agua_radiador: Int
+  combustivel: Int
+  lampadas: Int
+  chave_roda: Int
+  macaco: Int
+  triangulo: Int
+  extintor: Int
+  tapetes: Int
+  nivel_combustivel: Float
+  estepe: Int
+  observacoes: String
+  status: Int
+  buzina: Int
+  placa: String
+  data_hora_real: String
+  setas: Int
+}
+
+type ChecklistPayload {
+  id: Int!
+  mensagem: String!
+  status: Boolean!
+}
+
+input CheckoutInput {
+  id_solicitacao: Int!
+  limpeza_exterior: Int
+  exterior_detalhes: String
+  limpeza_interior: Int
+  interior_detalhes: String
+  nivel_oleo_motor: Int
+  nivel_oleo_direcao: Int
+  nivel_oleo_freio: Int
+  nivel_agua_radiador: Int
+  combustivel: Int
+  lampadas: Int
+  chave_roda: Int
+  macaco: Int
+  triangulo: Int
+  extintor: Int
+  tapetes: Int
+  nivel_combustivel: Float
+  estepe: Int
+  observacoes: String
+  status: Int
+  buzina: Int
+  placa: String
+  data_hora_real: String
+  setas: Int
+  ocorrencia: Int
+  acidente: Int
+  barulho: Int
+  motor: Int
+  descricao_incidentes: String
+}
+
+type CheckoutPayload {
+  id: Int!
+  mensagem: String!
+  status: Boolean!
+}
+
+input ViagemInput {
+  solicitacao_solicitante: Int!
+  solicitacao_qtdpessoa: String!
+  tipo_veiculo_id: Int!
+  enderecos: [String!]!
+  solicitacao_roteiro_ds: String
+  solicitacao_obs: String
+  solicitacao_dt: String!
+  solicitacao_hr: String
+  solicitacao_saida_dt_prevista: String
+  solicitacao_retorno_dt_prevista: String
+  solicitacao_unidadecusto: Int
+  solicitacao_situacao: Int
+  solicitacao_st: Int
+  solicitacao_dt_criacao: String
+  solicitacao_solicitante_est: Int
+  projeto_cd: Int
+  acao_cd: Int
+  territorio_cd: Int
+  fonte_cd: Int
+  solicitacao_numero: String
+  quantidade_pessoa: Int!
+  passageiro_ids: [Int!]!
+  ordem: Int!
+}
+
+type ViagemPayload {
+  mensagem: String!
+  status: Boolean!
+}
+
+type Query {
+  dashboard(idMotorista: Int!): Dashboard!
+  veiculos: [Veiculo!]!
+}
+
+type Mutation {
+  checklist(input: ChecklistInput!): ChecklistPayload!
+  checkout(input: CheckoutInput!): CheckoutPayload!
+  criarViagem(input: ViagemInput!): ViagemPayload!
+}
+
+type Veiculo {
+  veiculo_id: Int!
+  veiculo_placa: String!
+  tipo_veiculo_id: Int!
+  veiculo_st: Int!
+  veiculo_dt_criacao: String
+  veiculo_tag: String
+  pessoa_id: Int
+  hodometro_inicial: Int
+  hodometro_final: Int
+  tipo_veiculo_ds: String
+  tipo_veiculo_qtd_passageiro: Int!
+}
