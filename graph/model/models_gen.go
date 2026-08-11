@@ -65,6 +65,8 @@ type CheckoutInput struct {
 	Barulho             *int32   `json:"barulho,omitempty"`
 	Motor               *int32   `json:"motor,omitempty"`
 	DescricaoIncidentes *string  `json:"descricao_incidentes,omitempty"`
+	Pneus               *int32   `json:"pneus,omitempty"`
+	NiveisFluidos       *int32   `json:"niveis_fluidos,omitempty"`
 }
 
 type CheckoutPayload struct {
@@ -79,22 +81,32 @@ type Dashboard struct {
 }
 
 type Motorista struct {
-	ID    *int32  `json:"id,omitempty"`
-	Nome  string  `json:"nome"`
-	Placa *string `json:"placa,omitempty"`
+	ID   *int32 `json:"id,omitempty"`
+	Nome string `json:"nome"`
 }
 
 type Mutation struct {
 }
 
 type Parada struct {
-	Data        string  `json:"data"`
-	Horario     string  `json:"horario"`
-	Solicitante string  `json:"solicitante"`
-	Autorizado  string  `json:"autorizado"`
-	Origem      string  `json:"origem"`
-	Destino     string  `json:"destino"`
-	Placa       *string `json:"placa,omitempty"`
+	ViagemID      int32  `json:"viagemId"`
+	DataInicio    string `json:"dataInicio"`
+	HorarioInicio string `json:"horarioInicio"`
+	DataFinal     string `json:"dataFinal"`
+	HorarioFinal  string `json:"horarioFinal"`
+	Ordem         int32  `json:"ordem"`
+	Solicitante   string `json:"solicitante"`
+	Autorizado    string `json:"autorizado"`
+	Origem        string `json:"origem"`
+	Destino       string `json:"destino"`
+}
+
+type Passageiro struct {
+	PessoaID          int32  `json:"pessoa_id"`
+	PessoaNm          string `json:"pessoa_nm"`
+	SolicitacaoID     int32  `json:"solicitacao_id"`
+	PassageiroSt      int32  `json:"passageiro_st"`
+	SolicitacaoNumero string `json:"solicitacao_numero"`
 }
 
 type Query struct {

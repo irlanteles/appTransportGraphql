@@ -122,13 +122,16 @@ func (r *queryResolver) Dashboard(ctx context.Context, idMotorista int32) (*mode
 		paradas := make([]*model.Parada, len(v.Paradas))
 		for j, p := range v.Paradas {
 			paradas[j] = &model.Parada{
-				Data:        p.Data,
-				Horario:     p.Horario,
-				Solicitante: p.Solicitante,
-				Autorizado:  p.Autorizado,
-				Origem:      p.Origem,
-				Destino:     p.Destino,
-				Placa:       p.Placa,
+				ViagemID:      p.ViagemID,
+				DataInicio:    p.DataInicio,
+				HorarioInicio: p.HorarioInicio,
+				DataFinal:     p.DataFinal,
+				HorarioFinal:  p.HorarioFinal,
+				Ordem:         p.Ordem,
+				Solicitante:   p.Solicitante,
+				Autorizado:    p.Autorizado,
+				Origem:        p.Origem,
+				Destino:       p.Destino,
 			}
 		}
 		viagens[i] = &model.ViagemDashboard{
@@ -139,9 +142,8 @@ func (r *queryResolver) Dashboard(ctx context.Context, idMotorista int32) (*mode
 
 	return &model.Dashboard{
 		Motorista: &model.Motorista{
-			ID:    d.Motorista.ID,
-			Nome:  d.Motorista.Nome,
-			Placa: d.Motorista.Placa,
+			ID:   d.Motorista.ID,
+			Nome: d.Motorista.Nome,
 		},
 		Viagens: viagens,
 	}, nil
@@ -150,6 +152,11 @@ func (r *queryResolver) Dashboard(ctx context.Context, idMotorista int32) (*mode
 // Veiculos is the resolver for the veiculos field.
 func (r *queryResolver) Veiculos(ctx context.Context) ([]*model.Veiculo, error) {
 	return r.VeiculoService.ListarVeiculos(ctx)
+}
+
+// Passageiros is the resolver for the passageiros field.
+func (r *queryResolver) Passageiros(ctx context.Context, numeroSolicitacao string) ([]*model.Passageiro, error) {
+	return r.PassageiroService.ListarPassageiros(ctx, numeroSolicitacao)
 }
 
 // Mutation returns MutationResolver implementation.

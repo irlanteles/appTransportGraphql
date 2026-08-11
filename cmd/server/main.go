@@ -33,6 +33,7 @@ func main() {
 	viagemRepo := repositories.NewViagemRepository(db)
 	dashboardRepo := repositories.NewDashboardRepository(db)
 	veiculoRepo := repositories.NewVeiculoRepository(db)
+	passageiroRepo := repositories.NewPassageiroRepository(db)
 
 	// Inicialização dos Serviços
 	checklistService := services.NewChecklistService(checklistRepo)
@@ -40,6 +41,7 @@ func main() {
 	viagemService := services.NewViagemService(viagemRepo)
 	dashboardService := services.NewDashboardService(dashboardRepo)
 	veiculoService := services.NewVeiculoService(veiculoRepo)
+	passageiroService := services.NewPassageiroService(passageiroRepo)
 
 	// Configuração do GraphQL
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
@@ -47,8 +49,9 @@ func main() {
 			ChecklistService: checklistService,
 			CheckoutService:  checkoutService,
 			ViagemService:    viagemService,
-			DashboardService: dashboardService,
-			VeiculoService:   veiculoService,
+			DashboardService:  dashboardService,
+			VeiculoService:    veiculoService,
+			PassageiroService: passageiroService,
 		},
 	}))
 

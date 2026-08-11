@@ -1,18 +1,19 @@
 type Motorista {
   id: Int
   nome: String!
-  placa: String
 }
 
 type Parada {
-  data: String!
-  horario: String!
+  viagemId: Int!
+  dataInicio: String!
+  horarioInicio: String!
+  dataFinal: String!
+  horarioFinal: String!
+  ordem: Int!
   solicitante: String!
   autorizado: String!
   origem: String!
   destino: String!
-  placa: String
-
 }
 
 type ViagemDashboard {
@@ -88,6 +89,8 @@ input CheckoutInput {
   barulho: Int
   motor: Int
   descricao_incidentes: String
+  pneus: Int
+  niveis_fluidos: Int
 }
 
 type CheckoutPayload {
@@ -130,6 +133,7 @@ type ViagemPayload {
 type Query {
   dashboard(idMotorista: Int!): Dashboard!
   veiculos: [Veiculo!]!
+  passageiros(numeroSolicitacao: String!): [Passageiro!]!
 }
 
 type Mutation {
@@ -150,4 +154,12 @@ type Veiculo {
   hodometro_final: Int
   tipo_veiculo_ds: String
   tipo_veiculo_qtd_passageiro: Int!
+}
+
+type Passageiro {
+  pessoa_id: Int!
+  pessoa_nm: String!
+  solicitacao_id: Int!
+  passageiro_st: Int!
+  solicitacao_numero: String!
 }

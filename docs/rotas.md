@@ -37,13 +37,16 @@ query {
     motorista {
       id
       nome
-      placa
     }
     viagens {
       numeroSolicitacao
       paradas {
-        data
-        horario
+        viagemId
+        dataInicio
+        horarioInicio
+        dataFinal
+        horarioFinal
+        ordem
         solicitante
         autorizado
         origem
@@ -82,10 +85,37 @@ Realiza a inserção de um registro de checkout.
 ```graphql
 mutation {
   checkout(input: {
-    id_solicitacao: "123",
+    id_solicitacao: 123,
     limpeza_exterior: 1,
+    exterior_detalhes: "detalhes",
+    limpeza_interior: 1,
+    interior_detalhes: "detalhes",
     nivel_oleo_motor: 1,
-    # ... demais campos
+    nivel_oleo_direcao: 1,
+    nivel_oleo_freio: 1,
+    nivel_agua_radiador: 1,
+    combustivel: 1,
+    lampadas: 1,
+    chave_roda: 1,
+    macaco: 1,
+    triangulo: 1,
+    extintor: 1,
+    tapetes: 1,
+    nivel_combustivel: 10.5,
+    estepe: 1,
+    observacoes: "obs",
+    status: 1,
+    buzina: 1,
+    placa: "ABC1234",
+    data_hora_real: "2026-08-11T12:00:00Z",
+    setas: 1,
+    ocorrencia: 1,
+    acidente: 1,
+    barulho: 1,
+    motor: 1,
+    descricao_incidentes: "desc",
+    pneus: 1,
+    niveis_fluidos: 1
   }) {
     id
     mensagem
@@ -134,6 +164,23 @@ query {
     hodometro_final
     tipo_veiculo_ds
     tipo_veiculo_qtd_passageiro
+  }
+}
+```
+
+### 6. Passageiros (Query)
+
+Retorna a lista de passageiros de uma determinada solicitação.
+
+**GraphQL:**
+```graphql
+query {
+  passageiros(numeroSolicitacao: "202610") {
+    pessoa_id
+    pessoa_nm
+    solicitacao_id
+    passageiro_st
+    solicitacao_numero
   }
 }
 ```

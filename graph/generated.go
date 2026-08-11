@@ -65,9 +65,8 @@ type ComplexityRoot struct {
 	}
 
 	Motorista struct {
-		ID    func(childComplexity int) int
-		Nome  func(childComplexity int) int
-		Placa func(childComplexity int) int
+		ID   func(childComplexity int) int
+		Nome func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -77,18 +76,30 @@ type ComplexityRoot struct {
 	}
 
 	Parada struct {
-		Autorizado  func(childComplexity int) int
-		Data        func(childComplexity int) int
-		Destino     func(childComplexity int) int
-		Horario     func(childComplexity int) int
-		Origem      func(childComplexity int) int
-		Placa       func(childComplexity int) int
-		Solicitante func(childComplexity int) int
+		Autorizado    func(childComplexity int) int
+		DataFinal     func(childComplexity int) int
+		DataInicio    func(childComplexity int) int
+		Destino       func(childComplexity int) int
+		HorarioFinal  func(childComplexity int) int
+		HorarioInicio func(childComplexity int) int
+		Ordem         func(childComplexity int) int
+		Origem        func(childComplexity int) int
+		Solicitante   func(childComplexity int) int
+		ViagemID      func(childComplexity int) int
+	}
+
+	Passageiro struct {
+		PassageiroSt      func(childComplexity int) int
+		PessoaID          func(childComplexity int) int
+		PessoaNm          func(childComplexity int) int
+		SolicitacaoID     func(childComplexity int) int
+		SolicitacaoNumero func(childComplexity int) int
 	}
 
 	Query struct {
-		Dashboard func(childComplexity int, idMotorista int32) int
-		Veiculos  func(childComplexity int) int
+		Dashboard   func(childComplexity int, idMotorista int32) int
+		Passageiros func(childComplexity int, numeroSolicitacao string) int
+		Veiculos    func(childComplexity int) int
 	}
 
 	Veiculo struct {
@@ -124,6 +135,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Dashboard(ctx context.Context, idMotorista int32) (*model.Dashboard, error)
 	Veiculos(ctx context.Context) ([]*model.Veiculo, error)
+	Passageiros(ctx context.Context, numeroSolicitacao string) ([]*model.Passageiro, error)
 }
 
 type executableSchema struct {
@@ -208,12 +220,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Motorista.Nome(childComplexity), true
-	case "Motorista.placa":
-		if e.complexity.Motorista.Placa == nil {
-			break
-		}
-
-		return e.complexity.Motorista.Placa(childComplexity), true
 
 	case "Mutation.checklist":
 		if e.complexity.Mutation.Checklist == nil {
@@ -255,42 +261,91 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Parada.Autorizado(childComplexity), true
-	case "Parada.data":
-		if e.complexity.Parada.Data == nil {
+	case "Parada.dataFinal":
+		if e.complexity.Parada.DataFinal == nil {
 			break
 		}
 
-		return e.complexity.Parada.Data(childComplexity), true
+		return e.complexity.Parada.DataFinal(childComplexity), true
+	case "Parada.dataInicio":
+		if e.complexity.Parada.DataInicio == nil {
+			break
+		}
+
+		return e.complexity.Parada.DataInicio(childComplexity), true
 	case "Parada.destino":
 		if e.complexity.Parada.Destino == nil {
 			break
 		}
 
 		return e.complexity.Parada.Destino(childComplexity), true
-	case "Parada.horario":
-		if e.complexity.Parada.Horario == nil {
+	case "Parada.horarioFinal":
+		if e.complexity.Parada.HorarioFinal == nil {
 			break
 		}
 
-		return e.complexity.Parada.Horario(childComplexity), true
+		return e.complexity.Parada.HorarioFinal(childComplexity), true
+	case "Parada.horarioInicio":
+		if e.complexity.Parada.HorarioInicio == nil {
+			break
+		}
+
+		return e.complexity.Parada.HorarioInicio(childComplexity), true
+	case "Parada.ordem":
+		if e.complexity.Parada.Ordem == nil {
+			break
+		}
+
+		return e.complexity.Parada.Ordem(childComplexity), true
 	case "Parada.origem":
 		if e.complexity.Parada.Origem == nil {
 			break
 		}
 
 		return e.complexity.Parada.Origem(childComplexity), true
-	case "Parada.placa":
-		if e.complexity.Parada.Placa == nil {
-			break
-		}
-
-		return e.complexity.Parada.Placa(childComplexity), true
 	case "Parada.solicitante":
 		if e.complexity.Parada.Solicitante == nil {
 			break
 		}
 
 		return e.complexity.Parada.Solicitante(childComplexity), true
+	case "Parada.viagemId":
+		if e.complexity.Parada.ViagemID == nil {
+			break
+		}
+
+		return e.complexity.Parada.ViagemID(childComplexity), true
+
+	case "Passageiro.passageiro_st":
+		if e.complexity.Passageiro.PassageiroSt == nil {
+			break
+		}
+
+		return e.complexity.Passageiro.PassageiroSt(childComplexity), true
+	case "Passageiro.pessoa_id":
+		if e.complexity.Passageiro.PessoaID == nil {
+			break
+		}
+
+		return e.complexity.Passageiro.PessoaID(childComplexity), true
+	case "Passageiro.pessoa_nm":
+		if e.complexity.Passageiro.PessoaNm == nil {
+			break
+		}
+
+		return e.complexity.Passageiro.PessoaNm(childComplexity), true
+	case "Passageiro.solicitacao_id":
+		if e.complexity.Passageiro.SolicitacaoID == nil {
+			break
+		}
+
+		return e.complexity.Passageiro.SolicitacaoID(childComplexity), true
+	case "Passageiro.solicitacao_numero":
+		if e.complexity.Passageiro.SolicitacaoNumero == nil {
+			break
+		}
+
+		return e.complexity.Passageiro.SolicitacaoNumero(childComplexity), true
 
 	case "Query.dashboard":
 		if e.complexity.Query.Dashboard == nil {
@@ -303,6 +358,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.Dashboard(childComplexity, args["idMotorista"].(int32)), true
+	case "Query.passageiros":
+		if e.complexity.Query.Passageiros == nil {
+			break
+		}
+
+		args, err := ec.field_Query_passageiros_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Passageiros(childComplexity, args["numeroSolicitacao"].(string)), true
 	case "Query.veiculos":
 		if e.complexity.Query.Veiculos == nil {
 			break
@@ -585,6 +651,17 @@ func (ec *executionContext) field_Query_dashboard_args(ctx context.Context, rawA
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_passageiros_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "numeroSolicitacao", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["numeroSolicitacao"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field___Directive_args_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -839,8 +916,6 @@ func (ec *executionContext) fieldContext_Dashboard_motorista(_ context.Context, 
 				return ec.fieldContext_Motorista_id(ctx, field)
 			case "nome":
 				return ec.fieldContext_Motorista_nome(ctx, field)
-			case "placa":
-				return ec.fieldContext_Motorista_placa(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Motorista", field.Name)
 		},
@@ -929,35 +1004,6 @@ func (ec *executionContext) _Motorista_nome(ctx context.Context, field graphql.C
 }
 
 func (ec *executionContext) fieldContext_Motorista_nome(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Motorista",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Motorista_placa(ctx context.Context, field graphql.CollectedField, obj *model.Motorista) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Motorista_placa,
-		func(ctx context.Context) (any, error) {
-			return obj.Placa, nil
-		},
-		nil,
-		ec.marshalOString2ᚖstring,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Motorista_placa(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Motorista",
 		Field:      field,
@@ -1115,14 +1161,43 @@ func (ec *executionContext) fieldContext_Mutation_criarViagem(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Parada_data(ctx context.Context, field graphql.CollectedField, obj *model.Parada) (ret graphql.Marshaler) {
+func (ec *executionContext) _Parada_viagemId(ctx context.Context, field graphql.CollectedField, obj *model.Parada) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Parada_data,
+		ec.fieldContext_Parada_viagemId,
 		func(ctx context.Context) (any, error) {
-			return obj.Data, nil
+			return obj.ViagemID, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Parada_viagemId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Parada",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Parada_dataInicio(ctx context.Context, field graphql.CollectedField, obj *model.Parada) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Parada_dataInicio,
+		func(ctx context.Context) (any, error) {
+			return obj.DataInicio, nil
 		},
 		nil,
 		ec.marshalNString2string,
@@ -1131,7 +1206,7 @@ func (ec *executionContext) _Parada_data(ctx context.Context, field graphql.Coll
 	)
 }
 
-func (ec *executionContext) fieldContext_Parada_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Parada_dataInicio(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Parada",
 		Field:      field,
@@ -1144,14 +1219,14 @@ func (ec *executionContext) fieldContext_Parada_data(_ context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _Parada_horario(ctx context.Context, field graphql.CollectedField, obj *model.Parada) (ret graphql.Marshaler) {
+func (ec *executionContext) _Parada_horarioInicio(ctx context.Context, field graphql.CollectedField, obj *model.Parada) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Parada_horario,
+		ec.fieldContext_Parada_horarioInicio,
 		func(ctx context.Context) (any, error) {
-			return obj.Horario, nil
+			return obj.HorarioInicio, nil
 		},
 		nil,
 		ec.marshalNString2string,
@@ -1160,7 +1235,7 @@ func (ec *executionContext) _Parada_horario(ctx context.Context, field graphql.C
 	)
 }
 
-func (ec *executionContext) fieldContext_Parada_horario(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Parada_horarioInicio(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Parada",
 		Field:      field,
@@ -1168,6 +1243,93 @@ func (ec *executionContext) fieldContext_Parada_horario(_ context.Context, field
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Parada_dataFinal(ctx context.Context, field graphql.CollectedField, obj *model.Parada) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Parada_dataFinal,
+		func(ctx context.Context) (any, error) {
+			return obj.DataFinal, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Parada_dataFinal(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Parada",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Parada_horarioFinal(ctx context.Context, field graphql.CollectedField, obj *model.Parada) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Parada_horarioFinal,
+		func(ctx context.Context) (any, error) {
+			return obj.HorarioFinal, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Parada_horarioFinal(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Parada",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Parada_ordem(ctx context.Context, field graphql.CollectedField, obj *model.Parada) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Parada_ordem,
+		func(ctx context.Context) (any, error) {
+			return obj.Ordem, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Parada_ordem(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Parada",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1289,25 +1451,141 @@ func (ec *executionContext) fieldContext_Parada_destino(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Parada_placa(ctx context.Context, field graphql.CollectedField, obj *model.Parada) (ret graphql.Marshaler) {
+func (ec *executionContext) _Passageiro_pessoa_id(ctx context.Context, field graphql.CollectedField, obj *model.Passageiro) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Parada_placa,
+		ec.fieldContext_Passageiro_pessoa_id,
 		func(ctx context.Context) (any, error) {
-			return obj.Placa, nil
+			return obj.PessoaID, nil
 		},
 		nil,
-		ec.marshalOString2ᚖstring,
+		ec.marshalNInt2int32,
 		true,
-		false,
+		true,
 	)
 }
 
-func (ec *executionContext) fieldContext_Parada_placa(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Passageiro_pessoa_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Parada",
+		Object:     "Passageiro",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Passageiro_pessoa_nm(ctx context.Context, field graphql.CollectedField, obj *model.Passageiro) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Passageiro_pessoa_nm,
+		func(ctx context.Context) (any, error) {
+			return obj.PessoaNm, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Passageiro_pessoa_nm(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Passageiro",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Passageiro_solicitacao_id(ctx context.Context, field graphql.CollectedField, obj *model.Passageiro) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Passageiro_solicitacao_id,
+		func(ctx context.Context) (any, error) {
+			return obj.SolicitacaoID, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Passageiro_solicitacao_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Passageiro",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Passageiro_passageiro_st(ctx context.Context, field graphql.CollectedField, obj *model.Passageiro) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Passageiro_passageiro_st,
+		func(ctx context.Context) (any, error) {
+			return obj.PassageiroSt, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Passageiro_passageiro_st(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Passageiro",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Passageiro_solicitacao_numero(ctx context.Context, field graphql.CollectedField, obj *model.Passageiro) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Passageiro_solicitacao_numero,
+		func(ctx context.Context) (any, error) {
+			return obj.SolicitacaoNumero, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Passageiro_solicitacao_numero(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Passageiro",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1414,6 +1692,59 @@ func (ec *executionContext) fieldContext_Query_veiculos(_ context.Context, field
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Veiculo", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_passageiros(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_passageiros,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Passageiros(ctx, fc.Args["numeroSolicitacao"].(string))
+		},
+		nil,
+		ec.marshalNPassageiro2ᚕᚖgithubᚗcomᚋirlantelesᚋapiᚑgraphqlᚋgraphᚋmodelᚐPassageiroᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_passageiros(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "pessoa_id":
+				return ec.fieldContext_Passageiro_pessoa_id(ctx, field)
+			case "pessoa_nm":
+				return ec.fieldContext_Passageiro_pessoa_nm(ctx, field)
+			case "solicitacao_id":
+				return ec.fieldContext_Passageiro_solicitacao_id(ctx, field)
+			case "passageiro_st":
+				return ec.fieldContext_Passageiro_passageiro_st(ctx, field)
+			case "solicitacao_numero":
+				return ec.fieldContext_Passageiro_solicitacao_numero(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Passageiro", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_passageiros_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -1898,10 +2229,18 @@ func (ec *executionContext) fieldContext_ViagemDashboard_paradas(_ context.Conte
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "data":
-				return ec.fieldContext_Parada_data(ctx, field)
-			case "horario":
-				return ec.fieldContext_Parada_horario(ctx, field)
+			case "viagemId":
+				return ec.fieldContext_Parada_viagemId(ctx, field)
+			case "dataInicio":
+				return ec.fieldContext_Parada_dataInicio(ctx, field)
+			case "horarioInicio":
+				return ec.fieldContext_Parada_horarioInicio(ctx, field)
+			case "dataFinal":
+				return ec.fieldContext_Parada_dataFinal(ctx, field)
+			case "horarioFinal":
+				return ec.fieldContext_Parada_horarioFinal(ctx, field)
+			case "ordem":
+				return ec.fieldContext_Parada_ordem(ctx, field)
 			case "solicitante":
 				return ec.fieldContext_Parada_solicitante(ctx, field)
 			case "autorizado":
@@ -1910,8 +2249,6 @@ func (ec *executionContext) fieldContext_ViagemDashboard_paradas(_ context.Conte
 				return ec.fieldContext_Parada_origem(ctx, field)
 			case "destino":
 				return ec.fieldContext_Parada_destino(ctx, field)
-			case "placa":
-				return ec.fieldContext_Parada_placa(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Parada", field.Name)
 		},
@@ -3618,7 +3955,7 @@ func (ec *executionContext) unmarshalInputCheckoutInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id_solicitacao", "limpeza_exterior", "exterior_detalhes", "limpeza_interior", "interior_detalhes", "nivel_oleo_motor", "nivel_oleo_direcao", "nivel_oleo_freio", "nivel_agua_radiador", "combustivel", "lampadas", "chave_roda", "macaco", "triangulo", "extintor", "tapetes", "nivel_combustivel", "estepe", "observacoes", "status", "buzina", "placa", "data_hora_real", "setas", "ocorrencia", "acidente", "barulho", "motor", "descricao_incidentes"}
+	fieldsInOrder := [...]string{"id_solicitacao", "limpeza_exterior", "exterior_detalhes", "limpeza_interior", "interior_detalhes", "nivel_oleo_motor", "nivel_oleo_direcao", "nivel_oleo_freio", "nivel_agua_radiador", "combustivel", "lampadas", "chave_roda", "macaco", "triangulo", "extintor", "tapetes", "nivel_combustivel", "estepe", "observacoes", "status", "buzina", "placa", "data_hora_real", "setas", "ocorrencia", "acidente", "barulho", "motor", "descricao_incidentes", "pneus", "niveis_fluidos"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3828,6 +4165,20 @@ func (ec *executionContext) unmarshalInputCheckoutInput(ctx context.Context, obj
 				return it, err
 			}
 			it.DescricaoIncidentes = data
+		case "pneus":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pneus"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Pneus = data
+		case "niveis_fluidos":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("niveis_fluidos"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NiveisFluidos = data
 		}
 	}
 
@@ -4183,8 +4534,6 @@ func (ec *executionContext) _Motorista(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "placa":
-			out.Values[i] = ec._Motorista_placa(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4282,13 +4631,33 @@ func (ec *executionContext) _Parada(ctx context.Context, sel ast.SelectionSet, o
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Parada")
-		case "data":
-			out.Values[i] = ec._Parada_data(ctx, field, obj)
+		case "viagemId":
+			out.Values[i] = ec._Parada_viagemId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "horario":
-			out.Values[i] = ec._Parada_horario(ctx, field, obj)
+		case "dataInicio":
+			out.Values[i] = ec._Parada_dataInicio(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "horarioInicio":
+			out.Values[i] = ec._Parada_horarioInicio(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "dataFinal":
+			out.Values[i] = ec._Parada_dataFinal(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "horarioFinal":
+			out.Values[i] = ec._Parada_horarioFinal(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "ordem":
+			out.Values[i] = ec._Parada_ordem(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -4312,8 +4681,65 @@ func (ec *executionContext) _Parada(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "placa":
-			out.Values[i] = ec._Parada_placa(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var passageiroImplementors = []string{"Passageiro"}
+
+func (ec *executionContext) _Passageiro(ctx context.Context, sel ast.SelectionSet, obj *model.Passageiro) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, passageiroImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Passageiro")
+		case "pessoa_id":
+			out.Values[i] = ec._Passageiro_pessoa_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pessoa_nm":
+			out.Values[i] = ec._Passageiro_pessoa_nm(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "solicitacao_id":
+			out.Values[i] = ec._Passageiro_solicitacao_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "passageiro_st":
+			out.Values[i] = ec._Passageiro_passageiro_st(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "solicitacao_numero":
+			out.Values[i] = ec._Passageiro_solicitacao_numero(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4388,6 +4814,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_veiculos(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "passageiros":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_passageiros(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -5101,6 +5549,60 @@ func (ec *executionContext) marshalNParada2ᚖgithubᚗcomᚋirlantelesᚋapiᚑ
 		return graphql.Null
 	}
 	return ec._Parada(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPassageiro2ᚕᚖgithubᚗcomᚋirlantelesᚋapiᚑgraphqlᚋgraphᚋmodelᚐPassageiroᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Passageiro) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPassageiro2ᚖgithubᚗcomᚋirlantelesᚋapiᚑgraphqlᚋgraphᚋmodelᚐPassageiro(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNPassageiro2ᚖgithubᚗcomᚋirlantelesᚋapiᚑgraphqlᚋgraphᚋmodelᚐPassageiro(ctx context.Context, sel ast.SelectionSet, v *model.Passageiro) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Passageiro(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {

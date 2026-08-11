@@ -30,13 +30,16 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 			s.solicitacao_motorista AS motorista_id,
 			p.pessoa_nm AS motorista_nome,
 			s.solicitacao_numero,
-			v.veiculo_placa,
+			vi.id as viagem_id,
 			COALESCE(vi.endereco, '') AS destino,
-			TO_CHAR(vi.data_hora_real, 'YYYY-MM-DD') AS data,
-			TO_CHAR(vi.data_hora_real, 'HH24:MI') AS horario,
+			TO_CHAR(vi.data_hora_inicio, 'YYYY-MM-DD') AS dataInicio,
+			TO_CHAR(vi.data_hora_inicio, 'HH24:MI') AS horarioInicio,
+			TO_CHAR(vi.data_hora_final, 'YYYY-MM-DD') AS dataFinal,
+			TO_CHAR(vi.data_hora_final, 'HH24:MI') AS horarioFinal,
+			vi.ordem ,
 			COALESCE(p2.pessoa_nm, '') AS solicitante,
 			COALESCE(p3.pessoa_nm, '') AS autorizado,
-			vi.ordem  AS origem -- A origem no banco para parada normalmente depende da sequencia, usamos valor default ou o endereço da solicitação anterior.
+			vi2.endereco   AS origem -- A origem no banco para parada normalmente depende da sequencia, usamos valor default ou o endereço da solicitação anterior.
 		FROM transporte.solicitacao s
 		JOIN dados_unico.pessoa p ON p.pessoa_id = s.solicitacao_motorista
 		LEFT JOIN transporte.solicitacao_autorizacao sa ON sa.solicitacao_id = s.solicitacao_id
@@ -44,6 +47,7 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 		LEFT JOIN dados_unico.pessoa p2 ON s.solicitacao_solicitante = p2.pessoa_id
 		left join transporte.veiculo v on s.veiculo_id = v.veiculo_id
 		JOIN transporte.viagem vi ON vi.solicitacao_id = s.solicitacao_id
+		left join transporte.viagem vi2 on s.endereco_origem_id = vi2.id 
 		WHERE s.solicitacao_motorista = $1
 		ORDER BY s.solicitacao_numero, vi.ordem asc
 	`
@@ -63,16 +67,19 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 		var motoristaNome string
 		var numSolicitacao string
 		var destino string
-		var data sql.NullString
-		var horario sql.NullString
+		var dataInicio sql.NullString
+		var horarioInicio sql.NullString
+		var dataFinal sql.NullString
+		var horarioFinal sql.NullString
 		var solicitante string
 		var autorizado string
 		var origem string
-		var placa sql.NullString
+		var viagemID int
+		var ordem int
 
 		err := rows.Scan(
-			&motoristaID, &motoristaNome, &numSolicitacao, &placa, &destino, 
-			&data, &horario, &solicitante, &autorizado, &origem,
+			&motoristaID, &motoristaNome, &numSolicitacao, &viagemID, &destino, 
+			&dataInicio, &horarioInicio, &dataFinal, &horarioFinal, &ordem, &solicitante, &autorizado, &origem,
 		)
 		if err != nil {
 			return nil, err
@@ -81,21 +88,12 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 
 		id:= int32(motoristaID)
 
-		var placaPtr *string
-		if placa.Valid {
-			p := placa.String
-			placaPtr = &p
-		}
-
 		if !motoristaPreenchido {
 			dashboard.Motorista = &model.Motorista{
 				ID:   &id,
 				Nome: motoristaNome,
-				Placa: placaPtr,
 			}
 			motoristaPreenchido = true
-		} else if dashboard.Motorista.Placa == nil && placaPtr != nil {
-			dashboard.Motorista.Placa = placaPtr
 		}
 
 		viagem, exists := viagensMap[numSolicitacao]
@@ -107,19 +105,26 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 			viagensMap[numSolicitacao] = viagem
 		}
 
-		dt := ""
-		hr := ""
-		if data.Valid { dt = data.String }
-		if horario.Valid { hr = horario.String }
+		dtInicio := ""
+		hrInicio := ""
+		dtFinal := ""
+		hrFinal := ""
+		if dataInicio.Valid { dtInicio = dataInicio.String }
+		if horarioInicio.Valid { hrInicio = horarioInicio.String }
+		if dataFinal.Valid { dtFinal = dataFinal.String }
+		if horarioFinal.Valid { hrFinal = horarioFinal.String }
 
 		viagem.Paradas = append(viagem.Paradas, &model.Parada{
-			Data:        dt,
-			Horario:     hr,
-			Solicitante: solicitante,
-			Autorizado:  autorizado,
-			Origem:      origem,
-			Destino:     destino,
-			Placa:       placaPtr,
+			ViagemID:      int32(viagemID),
+			DataInicio:    dtInicio,
+			HorarioInicio: hrInicio,
+			DataFinal:     dtFinal,
+			HorarioFinal:  hrFinal,
+			Ordem:         int32(ordem),
+			Solicitante:   solicitante,
+			Autorizado:    autorizado,
+			Origem:        origem,
+			Destino:       destino,
 		})
 	}
 

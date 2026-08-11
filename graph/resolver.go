@@ -13,6 +13,7 @@ type Resolver struct {
 	ChecklistService *services.ChecklistService
 	CheckoutService  *services.CheckoutService
 	ViagemService    *services.ViagemService
-	DashboardService *services.DashboardService
-	VeiculoService   *services.VeiculoService
+	DashboardService  *services.DashboardService
+	VeiculoService    *services.VeiculoService
+	PassageiroService *services.PassageiroService
 }
