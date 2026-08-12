@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/irlanteles/api-graphql/graph/model"
+	"github.com/irlanteles/api-graphql/internal/utils"
 )
 
 type VeiculoRepository struct {
@@ -69,7 +70,8 @@ func (r *VeiculoRepository) BuscarVeiculosDisponiveis(ctx context.Context) ([]*m
 		}
 
 		if tpVeiculoDs.Valid {
-			v.TipoVeiculoDs = &tpVeiculoDs.String
+			utf8Str := utils.ToUTF8(tpVeiculoDs.String)
+			v.TipoVeiculoDs = &utf8Str
 		}
 
 		if dtCriacao.Valid {

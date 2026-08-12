@@ -110,6 +110,11 @@ func (r *mutationResolver) CriarViagem(ctx context.Context, input model.ViagemIn
 	}, nil
 }
 
+// UpdateRoteiro is the resolver for the updateRoteiro field.
+func (r *mutationResolver) UpdateRoteiro(ctx context.Context, input model.UpdateRoteiroInput) (*model.UpdateRoteiroPayload, error) {
+	return r.RoteiroService.UpdateRoteiro(ctx, input)
+}
+
 // Dashboard is the resolver for the dashboard field.
 func (r *queryResolver) Dashboard(ctx context.Context, idMotorista int32) (*model.Dashboard, error) {
 	d, err := r.DashboardService.ObterDashboard(ctx, fmt.Sprintf("%d", idMotorista))

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/irlanteles/api-graphql/graph/model"
+	"github.com/irlanteles/api-graphql/internal/utils"
 )
 
 type DashboardRepository struct {
@@ -28,28 +29,30 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 	query := `
 		SELECT 
 			s.solicitacao_motorista AS motorista_id,
+			s.solicitacao_situacao, 
 			p.pessoa_nm AS motorista_nome,
 			s.solicitacao_numero,
-			vi.id as viagem_id,
-			COALESCE(vi.endereco, '') AS destino,
-			TO_CHAR(vi.data_hora_inicio, 'YYYY-MM-DD') AS dataInicio,
-			TO_CHAR(vi.data_hora_inicio, 'HH24:MI') AS horarioInicio,
-			TO_CHAR(vi.data_hora_final, 'YYYY-MM-DD') AS dataFinal,
-			TO_CHAR(vi.data_hora_final, 'HH24:MI') AS horarioFinal,
-			vi.ordem ,
+			r.roteiro_id  as viagem_id,
+			COALESCE(m.municipio_ds, '') AS origem,
+			COALESCE(r.roteiro_local, '') AS destino,
+			TO_CHAR(s.solicitacao_saida_dt_prevista, 'YYYY-MM-DD') AS dataInicio,
+			TO_CHAR(s.solicitacao_saida_dt_prevista, 'HH24:MI') AS horarioInicio,
+			TO_CHAR(s.solicitacao_retorno_dt_prevista , 'YYYY-MM-DD') AS dataFinal,
+			TO_CHAR(s.solicitacao_retorno_dt_prevista, 'HH24:MI') AS horarioFinal,
 			COALESCE(p2.pessoa_nm, '') AS solicitante,
-			COALESCE(p3.pessoa_nm, '') AS autorizado,
-			vi2.endereco   AS origem -- A origem no banco para parada normalmente depende da sequencia, usamos valor default ou o endereço da solicitação anterior.
+			COALESCE(p3.pessoa_nm, '') AS autorizado
 		FROM transporte.solicitacao s
 		JOIN dados_unico.pessoa p ON p.pessoa_id = s.solicitacao_motorista
 		LEFT JOIN transporte.solicitacao_autorizacao sa ON sa.solicitacao_id = s.solicitacao_id
 		LEFT JOIN dados_unico.pessoa p3 ON p3.pessoa_id = sa.solicitacao_autorizacao_func
 		LEFT JOIN dados_unico.pessoa p2 ON s.solicitacao_solicitante = p2.pessoa_id
 		left join transporte.veiculo v on s.veiculo_id = v.veiculo_id
-		JOIN transporte.viagem vi ON vi.solicitacao_id = s.solicitacao_id
-		left join transporte.viagem vi2 on s.endereco_origem_id = vi2.id 
+		JOIN transporte.roteiro r  ON r.solicitacao_id = s.solicitacao_id
+		left join dados_unico.municipio m on m.municipio_cd = r.roteiro_origem
+		left join dados_unico.municipio m2 on m2.municipio_cd  = r.roteiro_destino 
 		WHERE s.solicitacao_motorista = $1
-		ORDER BY s.solicitacao_numero, vi.ordem asc
+		and s.solicitacao_st = 0
+		and s.solicitacao_situacao = 4
 	`
 	
 	rows, err := r.db.Query(query, idMotorista)
@@ -64,8 +67,11 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 
 	for rows.Next() {
 		var motoristaID int
+		var situacao sql.NullInt32
 		var motoristaNome string
 		var numSolicitacao string
+		var viagemID int
+		var origem sql.NullString
 		var destino string
 		var dataInicio sql.NullString
 		var horarioInicio sql.NullString
@@ -73,13 +79,11 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 		var horarioFinal sql.NullString
 		var solicitante string
 		var autorizado string
-		var origem string
-		var viagemID int
-		var ordem int
 
 		err := rows.Scan(
-			&motoristaID, &motoristaNome, &numSolicitacao, &viagemID, &destino, 
-			&dataInicio, &horarioInicio, &dataFinal, &horarioFinal, &ordem, &solicitante, &autorizado, &origem,
+			&motoristaID, &situacao, &motoristaNome, &numSolicitacao, &viagemID,
+			&origem, &destino, &dataInicio, &horarioInicio, &dataFinal, &horarioFinal,
+			&solicitante, &autorizado,
 		)
 		if err != nil {
 			return nil, err
@@ -91,7 +95,7 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 		if !motoristaPreenchido {
 			dashboard.Motorista = &model.Motorista{
 				ID:   &id,
-				Nome: motoristaNome,
+				Nome: utils.ToUTF8(motoristaNome),
 			}
 			motoristaPreenchido = true
 		}
@@ -114,17 +118,20 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 		if dataFinal.Valid { dtFinal = dataFinal.String }
 		if horarioFinal.Valid { hrFinal = horarioFinal.String }
 
+		origemStr := ""
+		if origem.Valid { origemStr = origem.String }
+
 		viagem.Paradas = append(viagem.Paradas, &model.Parada{
 			ViagemID:      int32(viagemID),
 			DataInicio:    dtInicio,
 			HorarioInicio: hrInicio,
 			DataFinal:     dtFinal,
 			HorarioFinal:  hrFinal,
-			Ordem:         int32(ordem),
-			Solicitante:   solicitante,
-			Autorizado:    autorizado,
-			Origem:        origem,
-			Destino:       destino,
+			Ordem:         0,
+			Solicitante:   utils.ToUTF8(solicitante),
+			Autorizado:    utils.ToUTF8(autorizado),
+			Origem:        utils.ToUTF8(origemStr),
+			Destino:       utils.ToUTF8(destino),
 		})
 	}
 

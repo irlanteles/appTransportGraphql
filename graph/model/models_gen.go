@@ -112,6 +112,18 @@ type Passageiro struct {
 type Query struct {
 }
 
+type UpdateRoteiroInput struct {
+	RoteiroID      int32   `json:"roteiro_id"`
+	RoteiroSt      *int32  `json:"roteiro_st,omitempty"`
+	DataHoraInicio *string `json:"data_hora_inicio,omitempty"`
+	DataHoraFim    *string `json:"data_hora_fim,omitempty"`
+}
+
+type UpdateRoteiroPayload struct {
+	Mensagem string `json:"mensagem"`
+	Status   bool   `json:"status"`
+}
+
 type Veiculo struct {
 	VeiculoID                int32   `json:"veiculo_id"`
 	VeiculoPlaca             string  `json:"veiculo_placa"`

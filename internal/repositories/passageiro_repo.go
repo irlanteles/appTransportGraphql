@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/irlanteles/api-graphql/graph/model"
+	"github.com/irlanteles/api-graphql/internal/utils"
 )
 
 type PassageiroRepository struct {
@@ -53,7 +54,7 @@ func (r *PassageiroRepository) ListarPassageiros(ctx context.Context, numeroSoli
 			p.PessoaID = pessoaID.Int32
 		}
 		if pessoaNm.Valid {
-			p.PessoaNm = pessoaNm.String
+			p.PessoaNm = utils.ToUTF8(pessoaNm.String)
 		}
 		if solicitacaoID.Valid {
 			p.SolicitacaoID = solicitacaoID.Int32

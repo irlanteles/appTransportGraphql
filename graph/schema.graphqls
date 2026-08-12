@@ -130,6 +130,18 @@ type ViagemPayload {
   status: Boolean!
 }
 
+input UpdateRoteiroInput {
+  roteiro_id: Int!
+  roteiro_st: Int
+  data_hora_inicio: String
+  data_hora_fim: String
+}
+
+type UpdateRoteiroPayload {
+  mensagem: String!
+  status: Boolean!
+}
+
 type Query {
   dashboard(idMotorista: Int!): Dashboard!
   veiculos: [Veiculo!]!
@@ -140,6 +152,7 @@ type Mutation {
   checklist(input: ChecklistInput!): ChecklistPayload!
   checkout(input: CheckoutInput!): CheckoutPayload!
   criarViagem(input: ViagemInput!): ViagemPayload!
+  updateRoteiro(input: UpdateRoteiroInput!): UpdateRoteiroPayload!
 }
 
 type Veiculo {

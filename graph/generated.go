@@ -70,9 +70,10 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		Checklist   func(childComplexity int, input model.ChecklistInput) int
-		Checkout    func(childComplexity int, input model.CheckoutInput) int
-		CriarViagem func(childComplexity int, input model.ViagemInput) int
+		Checklist     func(childComplexity int, input model.ChecklistInput) int
+		Checkout      func(childComplexity int, input model.CheckoutInput) int
+		CriarViagem   func(childComplexity int, input model.ViagemInput) int
+		UpdateRoteiro func(childComplexity int, input model.UpdateRoteiroInput) int
 	}
 
 	Parada struct {
@@ -100,6 +101,11 @@ type ComplexityRoot struct {
 		Dashboard   func(childComplexity int, idMotorista int32) int
 		Passageiros func(childComplexity int, numeroSolicitacao string) int
 		Veiculos    func(childComplexity int) int
+	}
+
+	UpdateRoteiroPayload struct {
+		Mensagem func(childComplexity int) int
+		Status   func(childComplexity int) int
 	}
 
 	Veiculo struct {
@@ -131,6 +137,7 @@ type MutationResolver interface {
 	Checklist(ctx context.Context, input model.ChecklistInput) (*model.ChecklistPayload, error)
 	Checkout(ctx context.Context, input model.CheckoutInput) (*model.CheckoutPayload, error)
 	CriarViagem(ctx context.Context, input model.ViagemInput) (*model.ViagemPayload, error)
+	UpdateRoteiro(ctx context.Context, input model.UpdateRoteiroInput) (*model.UpdateRoteiroPayload, error)
 }
 type QueryResolver interface {
 	Dashboard(ctx context.Context, idMotorista int32) (*model.Dashboard, error)
@@ -254,6 +261,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CriarViagem(childComplexity, args["input"].(model.ViagemInput)), true
+	case "Mutation.updateRoteiro":
+		if e.complexity.Mutation.UpdateRoteiro == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateRoteiro_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateRoteiro(childComplexity, args["input"].(model.UpdateRoteiroInput)), true
 
 	case "Parada.autorizado":
 		if e.complexity.Parada.Autorizado == nil {
@@ -376,6 +394,19 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Query.Veiculos(childComplexity), true
 
+	case "UpdateRoteiroPayload.mensagem":
+		if e.complexity.UpdateRoteiroPayload.Mensagem == nil {
+			break
+		}
+
+		return e.complexity.UpdateRoteiroPayload.Mensagem(childComplexity), true
+	case "UpdateRoteiroPayload.status":
+		if e.complexity.UpdateRoteiroPayload.Status == nil {
+			break
+		}
+
+		return e.complexity.UpdateRoteiroPayload.Status(childComplexity), true
+
 	case "Veiculo.hodometro_final":
 		if e.complexity.Veiculo.HodometroFinal == nil {
 			break
@@ -479,6 +510,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputChecklistInput,
 		ec.unmarshalInputCheckoutInput,
+		ec.unmarshalInputUpdateRoteiroInput,
 		ec.unmarshalInputViagemInput,
 	)
 	first := true
@@ -622,6 +654,17 @@ func (ec *executionContext) field_Mutation_criarViagem_args(ctx context.Context,
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNViagemInput2githubᚗcomᚋirlantelesᚋapiᚑgraphqlᚋgraphᚋmodelᚐViagemInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateRoteiro_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateRoteiroInput2githubᚗcomᚋirlantelesᚋapiᚑgraphqlᚋgraphᚋmodelᚐUpdateRoteiroInput)
 	if err != nil {
 		return nil, err
 	}
@@ -1155,6 +1198,53 @@ func (ec *executionContext) fieldContext_Mutation_criarViagem(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_criarViagem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateRoteiro(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateRoteiro,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateRoteiro(ctx, fc.Args["input"].(model.UpdateRoteiroInput))
+		},
+		nil,
+		ec.marshalNUpdateRoteiroPayload2ᚖgithubᚗcomᚋirlantelesᚋapiᚑgraphqlᚋgraphᚋmodelᚐUpdateRoteiroPayload,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateRoteiro(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "mensagem":
+				return ec.fieldContext_UpdateRoteiroPayload_mensagem(ctx, field)
+			case "status":
+				return ec.fieldContext_UpdateRoteiroPayload_status(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateRoteiroPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateRoteiro_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -1852,6 +1942,64 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateRoteiroPayload_mensagem(ctx context.Context, field graphql.CollectedField, obj *model.UpdateRoteiroPayload) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateRoteiroPayload_mensagem,
+		func(ctx context.Context) (any, error) {
+			return obj.Mensagem, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateRoteiroPayload_mensagem(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateRoteiroPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateRoteiroPayload_status(ctx context.Context, field graphql.CollectedField, obj *model.UpdateRoteiroPayload) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateRoteiroPayload_status,
+		func(ctx context.Context) (any, error) {
+			return obj.Status, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateRoteiroPayload_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateRoteiroPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4185,6 +4333,54 @@ func (ec *executionContext) unmarshalInputCheckoutInput(ctx context.Context, obj
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateRoteiroInput(ctx context.Context, obj any) (model.UpdateRoteiroInput, error) {
+	var it model.UpdateRoteiroInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"roteiro_id", "roteiro_st", "data_hora_inicio", "data_hora_fim"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "roteiro_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roteiro_id"))
+			data, err := ec.unmarshalNInt2int32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RoteiroID = data
+		case "roteiro_st":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roteiro_st"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RoteiroSt = data
+		case "data_hora_inicio":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data_hora_inicio"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DataHoraInicio = data
+		case "data_hora_fim":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data_hora_fim"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DataHoraFim = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputViagemInput(ctx context.Context, obj any) (model.ViagemInput, error) {
 	var it model.ViagemInput
 	asMap := map[string]any{}
@@ -4597,6 +4793,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "updateRoteiro":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateRoteiro(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4856,6 +5059,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateRoteiroPayloadImplementors = []string{"UpdateRoteiroPayload"}
+
+func (ec *executionContext) _UpdateRoteiroPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateRoteiroPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateRoteiroPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateRoteiroPayload")
+		case "mensagem":
+			out.Values[i] = ec._UpdateRoteiroPayload_mensagem(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "status":
+			out.Values[i] = ec._UpdateRoteiroPayload_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5649,6 +5896,25 @@ func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel
 	}
 
 	return ret
+}
+
+func (ec *executionContext) unmarshalNUpdateRoteiroInput2githubᚗcomᚋirlantelesᚋapiᚑgraphqlᚋgraphᚋmodelᚐUpdateRoteiroInput(ctx context.Context, v any) (model.UpdateRoteiroInput, error) {
+	res, err := ec.unmarshalInputUpdateRoteiroInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateRoteiroPayload2githubᚗcomᚋirlantelesᚋapiᚑgraphqlᚋgraphᚋmodelᚐUpdateRoteiroPayload(ctx context.Context, sel ast.SelectionSet, v model.UpdateRoteiroPayload) graphql.Marshaler {
+	return ec._UpdateRoteiroPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateRoteiroPayload2ᚖgithubᚗcomᚋirlantelesᚋapiᚑgraphqlᚋgraphᚋmodelᚐUpdateRoteiroPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateRoteiroPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateRoteiroPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNVeiculo2ᚕᚖgithubᚗcomᚋirlantelesᚋapiᚑgraphqlᚋgraphᚋmodelᚐVeiculoᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Veiculo) graphql.Marshaler {

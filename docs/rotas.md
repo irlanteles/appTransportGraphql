@@ -184,3 +184,22 @@ query {
   }
 }
 ```
+
+### 7. Atualizar Roteiro (Mutation)
+
+Atualiza os campos de um roteiro existente. Todos os campos de atualização são opcionais, ou seja, você pode atualizar apenas o status (`roteiro_st`), apenas as datas (`data_hora_inicio` / `data_hora_fim`), ou todos simultaneamente.
+
+**GraphQL:**
+```graphql
+mutation {
+  updateRoteiro(input: {
+    roteiro_id: 1,
+    roteiro_st: 2,
+    data_hora_inicio: "2026-08-12 14:00:00",
+    data_hora_fim: "2026-08-12 15:30:00"
+  }) {
+    mensagem
+    status
+  }
+}
+```
