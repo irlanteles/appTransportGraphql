@@ -3915,7 +3915,7 @@ func (ec *executionContext) unmarshalInputChecklistInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id_solicitacao", "limpeza_exterior", "exterior_detalhes", "limpeza_interior", "interior_detalhes", "nivel_oleo_motor", "nivel_oleo_direcao", "nivel_oleo_freio", "nivel_agua_radiador", "combustivel", "lampadas", "chave_roda", "macaco", "triangulo", "extintor", "tapetes", "nivel_combustivel", "estepe", "observacoes", "status", "buzina", "placa", "data_hora_real", "setas"}
+	fieldsInOrder := [...]string{"id_solicitacao", "limpeza_exterior", "exterior_detalhes", "limpeza_interior", "interior_detalhes", "nivel_oleo_motor", "nivel_oleo_direcao", "nivel_oleo_freio", "nivel_agua_radiador", "combustivel", "lampadas", "chave_roda", "macaco", "triangulo", "extintor", "tapetes", "nivel_combustivel", "estepe", "observacoes", "status", "buzina", "placa", "data_hora_real", "setas", "tipo"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4090,6 +4090,13 @@ func (ec *executionContext) unmarshalInputChecklistInput(ctx context.Context, ob
 				return it, err
 			}
 			it.Setas = data
+		case "tipo":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tipo"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Tipo = data
 		}
 	}
 

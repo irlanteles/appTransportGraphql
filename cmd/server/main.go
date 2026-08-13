@@ -9,6 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/irlanteles/api-graphql/graph"
 	"github.com/irlanteles/api-graphql/internal/database"
+	"github.com/irlanteles/api-graphql/internal/middleware"
 	"github.com/irlanteles/api-graphql/internal/repositories"
 	"github.com/irlanteles/api-graphql/internal/services"
 )
@@ -45,6 +46,11 @@ func main() {
 	passageiroService := services.NewPassageiroService(passageiroRepo)
 	roteiroService := services.NewRoteiroService(roteiroRepo)
 
+	// Carrega a chave pública
+	if err := middleware.LoadPublicKey("keys/public_key.pem"); err != nil {
+		log.Fatalf("Erro ao carregar chave pública: %v", err)
+	}
+
 	// Configuração do GraphQL
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
 		Resolvers: &graph.Resolver{
@@ -58,9 +64,13 @@ func main() {
 		},
 	}))
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	mux := http.NewServeMux()
+	mux.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	mux.Handle("/query", srv)
+
+	// Applica o middleware em todas as rotas
+	handlerComAutenticacao := middleware.AuthMiddleware(mux)
 
 	log.Printf("Conectado a http://0.0.0.0:%s/ no GraphQL Playground (acessível via rede local)", port)
-	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, nil))
+	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, handlerComAutenticacao))
 }

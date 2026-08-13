@@ -27,6 +27,7 @@ type ChecklistInput struct {
 	Placa             *string  `json:"placa,omitempty"`
 	DataHoraReal      *string  `json:"data_hora_real,omitempty"`
 	Setas             *int32   `json:"setas,omitempty"`
+	Tipo              *int32   `json:"tipo,omitempty"`
 }
 
 type ChecklistPayload struct {

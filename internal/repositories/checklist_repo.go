@@ -19,11 +19,11 @@ func (r *ChecklistRepository) Inserir(c *model.ChecklistInput) (int, error) {
 			idsolicitacao, limpezaexterior, exteriordetalhes, limpezainterior, interiordetalhes,
 			niveloleomotor, niveloleodirecao, niveloleofreio, nivelaguaradiador, combustivel,
 			lampadas, chaveroda, macaco, triangulo, extintor, tapetes, nivelcombustivel, estepe,
-			observacoes, status, buzina, placa, data_hora_real, setas
+			observacoes, status, buzina, placa, data_hora_real, setas,tipo
 		) VALUES (
 			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
 			$11, $12, $13, $14, $15, $16, $17, $18,
-			$19, $20, $21, $22, $23, $24
+			$19, $20, $21, $22, $23, $24, $25
 		) RETURNING id
 	`
 
@@ -32,7 +32,7 @@ func (r *ChecklistRepository) Inserir(c *model.ChecklistInput) (int, error) {
 		c.IDSolicitacao, c.LimpezaExterior, c.ExteriorDetalhes, c.LimpezaInterior, c.InteriorDetalhes,
 		c.NivelOleoMotor, c.NivelOleoDirecao, c.NivelOleoFreio, c.NivelAguaRadiador, c.Combustivel,
 		c.Lampadas, c.ChaveRoda, c.Macaco, c.Triangulo, c.Extintor, c.Tapetes, c.NivelCombustivel, c.Estepe,
-		c.Observacoes, c.Status, c.Buzina, c.Placa, c.DataHoraReal, c.Setas,
+		c.Observacoes, c.Status, c.Buzina, c.Placa, c.DataHoraReal, c.Setas, c.Tipo,
 	).Scan(&id)
 
 	if err != nil {

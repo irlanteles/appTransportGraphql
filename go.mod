@@ -4,6 +4,7 @@ go 1.25.0
 
 require (
 	github.com/99designs/gqlgen v0.17.80
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/lib/pq v1.12.3
 	github.com/vektah/gqlparser/v2 v2.5.36
 	golang.org/x/text v0.38.0

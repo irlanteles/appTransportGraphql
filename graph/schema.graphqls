@@ -51,6 +51,7 @@ input ChecklistInput {
   placa: String
   data_hora_real: String
   setas: Int
+  tipo: Int
 }
 
 type ChecklistPayload {
