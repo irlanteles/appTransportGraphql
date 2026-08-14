@@ -115,6 +115,11 @@ func (r *mutationResolver) UpdateRoteiro(ctx context.Context, input model.Update
 	return r.RoteiroService.UpdateRoteiro(ctx, input)
 }
 
+// UpdateSolicitacao is the resolver for the updateSolicitacao field.
+func (r *mutationResolver) UpdateSolicitacao(ctx context.Context, input model.UpdateSolicitacaoInput) (*model.UpdateSolicitacaoPayload, error) {
+	return r.SolicitacaoService.UpdateSolicitacao(ctx, input)
+}
+
 // Dashboard is the resolver for the dashboard field.
 func (r *queryResolver) Dashboard(ctx context.Context, idMotorista int32) (*model.Dashboard, error) {
 	d, err := r.DashboardService.ObterDashboard(ctx, fmt.Sprintf("%d", idMotorista))
@@ -127,7 +132,7 @@ func (r *queryResolver) Dashboard(ctx context.Context, idMotorista int32) (*mode
 		paradas := make([]*model.Parada, len(v.Paradas))
 		for j, p := range v.Paradas {
 			paradas[j] = &model.Parada{
-				ViagemID:      p.ViagemID,
+				RoteiroID:     p.RoteiroID,
 				DataInicio:    p.DataInicio,
 				HorarioInicio: p.HorarioInicio,
 				DataFinal:     p.DataFinal,
@@ -140,7 +145,9 @@ func (r *queryResolver) Dashboard(ctx context.Context, idMotorista int32) (*mode
 			}
 		}
 		viagens[i] = &model.ViagemDashboard{
+			SolicitacaoID:     v.SolicitacaoID,
 			NumeroSolicitacao: v.NumeroSolicitacao,
+			RoteiroDs:         v.RoteiroDs,
 			Paradas:           paradas,
 		}
 	}

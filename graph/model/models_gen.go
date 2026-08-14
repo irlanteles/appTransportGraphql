@@ -90,7 +90,7 @@ type Mutation struct {
 }
 
 type Parada struct {
-	ViagemID      int32  `json:"viagemId"`
+	RoteiroID     int32  `json:"roteiroId"`
 	DataInicio    string `json:"dataInicio"`
 	HorarioInicio string `json:"horarioInicio"`
 	DataFinal     string `json:"dataFinal"`
@@ -113,6 +113,17 @@ type Passageiro struct {
 type Query struct {
 }
 
+type Solicitacao struct {
+	SolicitacaoID          int32   `json:"solicitacao_id"`
+	SolicitacaoSituacao    *int32  `json:"solicitacao_situacao,omitempty"`
+	SolicitacaoSaidaDt     *string `json:"solicitacao_saida_dt,omitempty"`
+	SolicitacaoRetornoDt   *string `json:"solicitacao_retorno_dt,omitempty"`
+	SolicitacaoSt          *int32  `json:"solicitacao_st,omitempty"`
+	SolicitacaoKminicial   *string `json:"solicitacao_kminicial,omitempty"`
+	SolicitacaoKmfinal     *string `json:"solicitacao_kmfinal,omitempty"`
+	SolicitacaoDtAlteracao *string `json:"solicitacao_dt_alteracao,omitempty"`
+}
+
 type UpdateRoteiroInput struct {
 	RoteiroID      int32   `json:"roteiro_id"`
 	RoteiroSt      *int32  `json:"roteiro_st,omitempty"`
@@ -123,6 +134,22 @@ type UpdateRoteiroInput struct {
 type UpdateRoteiroPayload struct {
 	Mensagem string `json:"mensagem"`
 	Status   bool   `json:"status"`
+}
+
+type UpdateSolicitacaoInput struct {
+	SolicitacaoID        int32   `json:"solicitacao_id"`
+	SolicitacaoSituacao  *int32  `json:"solicitacao_situacao,omitempty"`
+	SolicitacaoSaidaDt   *string `json:"solicitacao_saida_dt,omitempty"`
+	SolicitacaoRetornoDt *string `json:"solicitacao_retorno_dt,omitempty"`
+	SolicitacaoSt        *int32  `json:"solicitacao_st,omitempty"`
+	SolicitacaoKminicial *string `json:"solicitacao_kminicial,omitempty"`
+	SolicitacaoKmfinal   *string `json:"solicitacao_kmfinal,omitempty"`
+}
+
+type UpdateSolicitacaoPayload struct {
+	Mensagem    string       `json:"mensagem"`
+	Status      bool         `json:"status"`
+	Solicitacao *Solicitacao `json:"solicitacao,omitempty"`
 }
 
 type Veiculo struct {
@@ -140,7 +167,9 @@ type Veiculo struct {
 }
 
 type ViagemDashboard struct {
+	SolicitacaoID     int32     `json:"solicitacaoId"`
 	NumeroSolicitacao string    `json:"numeroSolicitacao"`
+	RoteiroDs         *string   `json:"roteiroDs,omitempty"`
 	Paradas           []*Parada `json:"paradas"`
 }
 

@@ -4,7 +4,7 @@ type Motorista {
 }
 
 type Parada {
-  viagemId: Int!
+  roteiroId: Int!
   dataInicio: String!
   horarioInicio: String!
   dataFinal: String!
@@ -17,7 +17,9 @@ type Parada {
 }
 
 type ViagemDashboard {
+  solicitacaoId: Int!
   numeroSolicitacao: String!
+  roteiroDs: String
   paradas: [Parada!]!
 }
 
@@ -143,6 +145,33 @@ type UpdateRoteiroPayload {
   status: Boolean!
 }
 
+input UpdateSolicitacaoInput {
+  solicitacao_id: Int!
+  solicitacao_situacao: Int
+  solicitacao_saida_dt: String
+  solicitacao_retorno_dt: String
+  solicitacao_st: Int
+  solicitacao_kminicial: String
+  solicitacao_kmfinal: String
+}
+
+type Solicitacao {
+  solicitacao_id: Int!
+  solicitacao_situacao: Int
+  solicitacao_saida_dt: String
+  solicitacao_retorno_dt: String
+  solicitacao_st: Int
+  solicitacao_kminicial: String
+  solicitacao_kmfinal: String
+  solicitacao_dt_alteracao: String
+}
+
+type UpdateSolicitacaoPayload {
+  mensagem: String!
+  status: Boolean!
+  solicitacao: Solicitacao
+}
+
 type Query {
   dashboard(idMotorista: Int!): Dashboard!
   veiculos: [Veiculo!]!
@@ -154,6 +183,7 @@ type Mutation {
   checkout(input: CheckoutInput!): CheckoutPayload!
   criarViagem(input: ViagemInput!): ViagemPayload!
   updateRoteiro(input: UpdateRoteiroInput!): UpdateRoteiroPayload!
+  updateSolicitacao(input: UpdateSolicitacaoInput!): UpdateSolicitacaoPayload!
 }
 
 type Veiculo {

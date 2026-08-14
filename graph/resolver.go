@@ -17,4 +17,5 @@ type Resolver struct {
 	VeiculoService    *services.VeiculoService
 	PassageiroService *services.PassageiroService
 	RoteiroService    *services.RoteiroService
+	SolicitacaoService *services.SolicitacaoService
 }

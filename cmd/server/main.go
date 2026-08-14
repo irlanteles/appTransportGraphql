@@ -36,6 +36,7 @@ func main() {
 	veiculoRepo := repositories.NewVeiculoRepository(db)
 	passageiroRepo := repositories.NewPassageiroRepository(db)
 	roteiroRepo := repositories.NewRoteiroRepository(db)
+	solicitacaoRepo := repositories.NewSolicitacaoRepository(db)
 
 	// Inicialização dos Serviços
 	checklistService := services.NewChecklistService(checklistRepo)
@@ -45,22 +46,24 @@ func main() {
 	veiculoService := services.NewVeiculoService(veiculoRepo)
 	passageiroService := services.NewPassageiroService(passageiroRepo)
 	roteiroService := services.NewRoteiroService(roteiroRepo)
+	solicitacaoService := services.NewSolicitacaoService(solicitacaoRepo)
 
 	// Carrega a chave pública
 	if err := middleware.LoadPublicKey("keys/public_key.pem"); err != nil {
-		log.Fatalf("Erro ao carregar chave pública: %v", err)
+		log.Fatalf("Erro ao carregar chave pñblica: %v", err)
 	}
 
-	// Configuração do GraphQL
+	// Configuração dos GraphQL
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
 		Resolvers: &graph.Resolver{
-			ChecklistService: checklistService,
-			CheckoutService:  checkoutService,
-			ViagemService:    viagemService,
+			ChecklistService:   checklistService,
+			CheckoutService:    checkoutService,
+			ViagemService:     viagemService,
 			DashboardService:  dashboardService,
-			VeiculoService:    veiculoService,
-			PassageiroService: passageiroService,
+			VeiculoService:     veiculoService,
+			PassageiroService:  passageiroService,
 			RoteiroService:    roteiroService,
+			SolicitacaoService: solicitacaoService,
 		},
 	}))
 
@@ -71,6 +74,6 @@ func main() {
 	// Applica o middleware em todas as rotas
 	handlerComAutenticacao := middleware.AuthMiddleware(mux)
 
-	log.Printf("Conectado a http://0.0.0.0:%s/ no GraphQL Playground (acessível via rede local)", port)
+	log.Printf("Conectado a http://0.0.0.0:%s/ no GraphQL Playground (acessævel via rede local)", port)
 	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, handlerComAutenticacao))
 }

@@ -28,6 +28,7 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 	
 	query := `
 		SELECT 
+			s.solicitacao_id,
 			s.solicitacao_motorista AS motorista_id,
 			s.solicitacao_situacao, 
 			p.pessoa_nm AS motorista_nome,
@@ -40,7 +41,8 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 			TO_CHAR(s.solicitacao_retorno_dt_prevista , 'YYYY-MM-DD') AS dataFinal,
 			TO_CHAR(s.solicitacao_retorno_dt_prevista, 'HH24:MI') AS horarioFinal,
 			COALESCE(p2.pessoa_nm, '') AS solicitante,
-			COALESCE(p3.pessoa_nm, '') AS autorizado
+			COALESCE(p3.pessoa_nm, '') AS autorizado,
+			COALESCE(s.solicitacao_roteiro_ds, '') AS roteiroDs
 		FROM transporte.solicitacao s
 		JOIN dados_unico.pessoa p ON p.pessoa_id = s.solicitacao_motorista
 		LEFT JOIN transporte.solicitacao_autorizacao sa ON sa.solicitacao_id = s.solicitacao_id
@@ -52,7 +54,7 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 		left join dados_unico.municipio m2 on m2.municipio_cd  = r.roteiro_destino 
 		WHERE s.solicitacao_motorista = $1
 		and s.solicitacao_st = 0
-		and s.solicitacao_situacao = 4
+		and s.solicitacao_situacao = 2
 	`
 	
 	rows, err := r.db.Query(query, idMotorista)
@@ -66,11 +68,12 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 	motoristaPreenchido := false
 
 	for rows.Next() {
+		var solicitacaoID int
 		var motoristaID int
 		var situacao sql.NullInt32
 		var motoristaNome string
 		var numSolicitacao string
-		var viagemID int
+		var roteiroId int
 		var origem sql.NullString
 		var destino string
 		var dataInicio sql.NullString
@@ -79,18 +82,18 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 		var horarioFinal sql.NullString
 		var solicitante string
 		var autorizado string
+		var roteiroDs sql.NullString
 
 		err := rows.Scan(
-			&motoristaID, &situacao, &motoristaNome, &numSolicitacao, &viagemID,
+			&solicitacaoID, &motoristaID, &situacao, &motoristaNome, &numSolicitacao, &roteiroId,
 			&origem, &destino, &dataInicio, &horarioInicio, &dataFinal, &horarioFinal,
-			&solicitante, &autorizado,
+			&solicitante, &autorizado, &roteiroDs,
 		)
 		if err != nil {
 			return nil, err
 		}
 
-
-		id:= int32(motoristaID)
+		id := int32(motoristaID)
 
 		if !motoristaPreenchido {
 			dashboard.Motorista = &model.Motorista{
@@ -102,8 +105,15 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 
 		viagem, exists := viagensMap[numSolicitacao]
 		if !exists {
+			rotDsStr := ""
+			if roteiroDs.Valid { rotDsStr = utils.ToUTF8(roteiroDs.String) }
+			var rotDsPtr *string
+			if rotDsStr != "" { rotDsPtr = &rotDsStr }
+
 			viagem = &model.ViagemDashboard{
+				SolicitacaoID:     int32(solicitacaoID),
 				NumeroSolicitacao: numSolicitacao,
+				RoteiroDs:         rotDsPtr,
 				Paradas:           []*model.Parada{},
 			}
 			viagensMap[numSolicitacao] = viagem
@@ -122,7 +132,7 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 		if origem.Valid { origemStr = origem.String }
 
 		viagem.Paradas = append(viagem.Paradas, &model.Parada{
-			ViagemID:      int32(viagemID),
+			RoteiroID:     int32(roteiroId),
 			DataInicio:    dtInicio,
 			HorarioInicio: hrInicio,
 			DataFinal:     dtFinal,
@@ -144,5 +154,3 @@ func (r *DashboardRepository) GetDashboardData(idMotorista string) (*model.Dashb
 
 	return dashboard, nil
 }
-
-

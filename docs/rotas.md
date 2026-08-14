@@ -33,15 +33,17 @@ Retorna as informações para o dashboard do motorista.
 **GraphQL:**
 ```graphql
 query {
-  dashboard(idMotorista: "15") {
+  dashboard(idMotorista: 15) {
     motorista {
       id
       nome
     }
     viagens {
+      solicitacaoId
       numeroSolicitacao
+      roteiroDs
       paradas {
-        viagemId
+        roteiroId
         dataInicio
         horarioInicio
         dataFinal
@@ -65,10 +67,31 @@ Realiza a inserção de um registro de checklist de veículo.
 ```graphql
 mutation {
   checklist(input: {
-    id_solicitacao: "123",
+    id_solicitacao: 123,
     limpeza_exterior: 1,
+    exterior_detalhes: "detalhes",
+    limpeza_interior: 1,
+    interior_detalhes: "detalhes",
     nivel_oleo_motor: 1,
-    # ... demais campos
+    nivel_oleo_direcao: 1,
+    nivel_oleo_freio: 1,
+    nivel_agua_radiador: 1,
+    combustivel: 1,
+    lampadas: 1,
+    chave_roda: 1,
+    macaco: 1,
+    triangulo: 1,
+    extintor: 1,
+    tapetes: 1,
+    nivel_combustivel: 10.5,
+    estepe: 1,
+    observacoes: "obs",
+    status: 1,
+    buzina: 1,
+    placa: "ABC1234",
+    data_hora_real: "2026-08-11T12:00:00Z",
+    setas: 1,
+    tipo: 1
   }) {
     id
     mensagem
@@ -137,7 +160,24 @@ mutation {
     tipo_veiculo_id: 1,
     enderecos: ["Matriz", "Filial Norte"],
     solicitacao_roteiro_ds: "Rota padrão",
-    # ... demais campos
+    solicitacao_obs: "Viagem de diretoria",
+    solicitacao_dt: "2026-08-15",
+    solicitacao_hr: "08:00",
+    solicitacao_saida_dt_prevista: "2026-08-15 08:30:00",
+    solicitacao_retorno_dt_prevista: "2026-08-15 18:00:00",
+    solicitacao_unidadecusto: 200,
+    solicitacao_situacao: 4,
+    solicitacao_st: 0,
+    solicitacao_dt_criacao: "2026-08-14 10:00:00",
+    solicitacao_solicitante_est: 0,
+    projeto_cd: 1234,
+    acao_cd: 5678,
+    territorio_cd: 11,
+    fonte_cd: 1,
+    solicitacao_numero: "202610",
+    quantidade_pessoa: 2,
+    passageiro_ids: [45, 46],
+    ordem: 1
   }) {
     mensagem
     status
@@ -187,7 +227,7 @@ query {
 
 ### 7. Atualizar Roteiro (Mutation)
 
-Atualiza os campos de um roteiro existente. Todos os campos de atualização são opcionais, ou seja, você pode atualizar apenas o status (`roteiro_st`), apenas as datas (`data_hora_inicio` / `data_hora_fim`), ou todos simultaneamente.
+Atualiza os campos de um roteiro existente. Todos os campos de atualização são opcionais.
 
 **GraphQL:**
 ```graphql
@@ -200,6 +240,38 @@ mutation {
   }) {
     mensagem
     status
+  }
+}
+```
+
+### 8. Atualizar Solicitacao (Mutation)
+
+Atualiza os campos de uma solicitação de viagem (status, km, datas, etc).
+
+**GraphQL:**
+```graphql
+mutation {
+  updateSolicitacao(input: {
+    solicitacao_id: 59111,
+    solicitacao_situacao: 5,
+    solicitacao_saida_dt: "2026-08-14 10:00:00",
+    solicitacao_retorno_dt: "2026-08-14 11:30:00",
+    solicitacao_kminicial: "15000",
+    solicitacao_kmfinal: "15120",
+    solicitacao_st: 0
+  }) {
+    mensagem
+    status
+    solicitacao {
+      solicitacao_id
+      solicitacao_situacao
+      solicitacao_saida_dt
+      solicitacao_retorno_dt
+      solicitacao_st
+      solicitacao_kminicial
+      solicitacao_kmfinal
+      solicitacao_dt_alteracao
+    }
   }
 }
 ```
